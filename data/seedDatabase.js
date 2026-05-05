@@ -32,11 +32,11 @@ function query(connection, sql, values = []) {
   });
 }
 
-async function waitForDatabase(maxAttempts = 20) {
+async function waitForDatabase(maxAttempts = 30) {
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const connection = createConnection();
     try {
-      await query(connection, "SELECT 1");
+      await query(connection, "SELECT 1 FROM pokemon LIMIT 1");
       connection.end();
       return;
     } catch (error) {
@@ -128,7 +128,11 @@ async function seed() {
     await query(connection, "COMMIT");
     console.log(`Seed complete. Loaded ${data.length} pokemon.`);
   } catch (error) {
-    await query(connection, "ROLLBACK");
+    try {
+      await query(connection, "ROLLBACK");
+    } catch (rollbackError) {
+      console.error("ROLLBACK failed:", rollbackError);
+    }
     throw error;
   } finally {
     connection.end();
@@ -136,6 +140,6 @@ async function seed() {
 }
 
 seed().catch((error) => {
-  console.error("Seed failed:", error.message);
+  console.error("Seed failed:", error);
   process.exit(1);
 });

@@ -1,12 +1,16 @@
 const container = document.querySelector(".container");
+const apiBaseUrl = window.__POKEDEX_API_BASE_URL__ || "http://localhost:5000";
 
 function fetchPokemon() { 
-    fetch(`http://localhost:5000/pokedex`)
+  fetch(`${apiBaseUrl}/pokedex`)
      .then((res) => res.json())
      .then((pokemon) => {
      
       pokemon.map(i =>showPokemon(i.id, i.name, i.type, i.img));
        
+   })
+   .catch((error) => {
+    console.error("Failed to fetch pokemon:", error);
      });
  };
 
